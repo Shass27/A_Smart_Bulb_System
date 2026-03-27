@@ -19,6 +19,8 @@ void setup() {
   Wire.begin();
   delay(1000);
 
+  digitalWrite(B1, HIGH);
+
   lcd.init();
   lcd.backlight();
 
@@ -36,7 +38,7 @@ void loop() {
   //shows LOW if object (<3 cm)
   if (irValue == LOW) {
     bulbState = true;
-    digitalWrite(B1, HIGH);
+    digitalWrite(B1, LOW);
     irTimer = millis();
 
     Serial.println("IR DETECTED (<3cm)");
@@ -63,7 +65,7 @@ void loop() {
   // turning OFF bulb after 1 min
   if (bulbState && (millis() - irTimer >= ON_TIME)) {
     bulbState = false;
-    digitalWrite(B1, LOW);
+    digitalWrite(B1, HIGH);
 
     Serial.println("TIMEOUT... B1 is OFF");
 
