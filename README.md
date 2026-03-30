@@ -208,7 +208,7 @@ Line 2: ON  OFF ON
 
 The system serves a responsive HTML5 interface with embedded CSS. The GUI provides individual bulb control and master ON/OFF switches.
 
-![Web GUI Control Interface](Screenshots/GUI.jpg)
+<img src="Screenshots/GUI.jpg" alt="Web GUI Control Interface" width="600">
 
 **Features:**
 - Real-time color-coded status indicators
@@ -224,7 +224,7 @@ The system serves a responsive HTML5 interface with embedded CSS. The GUI provid
 
 Control via Android application **Serial Bluetooth Terminal** (developed by Kai Morich, available on Google Play Store).
 
-![Bluetooth Control Interface](Screenshots/BT_control.jpg)
+<img src="Screenshots/BT_control.jpg" alt="Bluetooth Control Interface" width="600">
 
 **Connection Procedure:**
 1. Power on ESP32 → `ESP32_SMART_HOME` becomes discoverable
