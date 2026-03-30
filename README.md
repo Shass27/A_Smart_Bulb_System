@@ -2,7 +2,7 @@
 
 ## Abstract
 
-This project presents the design and implementation of an intelligent lighting control system utilizing the ESP32 microcontroller platform. The system integrates multiple sensor modalities and communication protocols to provide autonomous and user-controlled lighting management. Three independent bulb control channels are implemented, each responding to distinct input mechanisms: infrared proximity detection, passive infrared motion sensing, and Bluetooth serial communication. Additionally, a web-based graphical user interface enables centralized control via Wi-Fi connectivity. The system architecture demonstrates practical integration of Internet of Things (IoT) principles in residential automation applications.
+This project presents the design and implementation of an intelligent lighting control system utilizing the ESP32 microcontroller platform. The system integrates multiple sensor modalities and communication protocols to provide autonomous and user-controlled lighting management. Three independent bulb control channels are implemented, each responding to distinct input mechanisms: infrared proximity detection, passive infrared motion sensing, and Bluetooth serial communication. A web-based graphical user interface enables centralized control via Wi-Fi connectivity, demonstrating practical integration of IoT principles in residential automation applications.
 
 ---
 
@@ -48,7 +48,7 @@ The system implements a four-layer hierarchy with ESP32 as the central controlle
 | Bulb B2 | PIR Motion + Manual | Passive Infrared | GPIO 27 (Input), GPIO 26 (Output) | 60 seconds |
 | Bulb B3 | Manual Only | N/A | GPIO 25 (Output) | No timeout |
 
-**Control Priority:** Sensor activation triggers automatic timeout. Manual control (Wi-Fi/Bluetooth) overrides sensor state and resets timers.
+**Control Priority:** Sensor activation triggers automatic 60-second timeout. Manual control (Wi-Fi/Bluetooth) overrides sensor state and resets timers.
 
 ---
 
@@ -145,14 +145,12 @@ void loop() {
 
 **IR Proximity Detection (Bulb B1):**
 - Active-LOW detection when object within 2-3 cm
-- Activates B1, records timestamp
-- 60-second automatic timeout after last detection
+- Activates B1, records timestamp; auto-deactivates after 60-second timeout
 
 **PIR Motion Detection (Bulb B2):**
 - Warm-up period: 30 seconds after power-on
-- Activates B2, records timestamp
-- Timer resets on continued motion detection
-- 60-second timeout after no motion
+- Activates B2, records timestamp; timer resets on continued motion detection
+- Auto-deactivates after 60-second timeout with no motion
 
 ### Communication Protocols
 
@@ -160,7 +158,6 @@ void loop() {
 - Device name: `ESP32_SMART_HOME`
 - Pairing PIN: `1234` (default)
 - Commands: `B3ON` / `B3OFF` (newline-terminated, case-sensitive)
-- Advantage: No network infrastructure required
 
 **Wi-Fi Web Server:**
 - HTTP server on port 80
@@ -177,16 +174,14 @@ void loop() {
 | `/ALLON` / `/ALLOFF` | Control all bulbs |
 | `/` | Serve control GUI |
 
-### Timer and Display Management
+### Display Management
 
-**Automatic Timeout:** Bulbs B1 and B2 automatically deactivate 60 seconds after sensor trigger unless motion continues or manual override occurs.
-
-**LCD Display:** Updates at 1 Hz showing real-time bulb status.
+LCD updates at 1 Hz showing real-time bulb status:
 
 ```
 Display Format:
 Line 1: IR  PIR  BT
-Line 2: ON  OFF ON
+Line 2: ON  OFF  ON
 ```
 
 ---
@@ -195,34 +190,23 @@ Line 2: ON  OFF ON
 
 ### Web-Based Control Panel
 
-The system serves a responsive HTML5 interface with embedded CSS. The GUI provides individual bulb control and master ON/OFF switches.
+The system serves a responsive HTML5 interface with embedded CSS, providing individual bulb control and master ON/OFF switches.
 
 <img src="Screenshots/GUI.jpg" alt="Web GUI Control Interface" width="300">
 
 **Features:**
 - Real-time color-coded status indicators
-- Individual bulb ON/OFF buttons
-- Master controls for simultaneous operation
-- Mobile-responsive design (viewport optimization)
-- Self-contained HTML/CSS (no external dependencies)
-- Dark theme with green (#22c55e) ON indicators
-- Glow effects on active button states
-- Google Fonts integration (Rajdhani typography)
+- Individual bulb ON/OFF buttons and master controls
+- Mobile-responsive design; self-contained (no external dependencies)
+- Dark theme with green (#22c55e) ON indicators, glow effects, Google Fonts (Rajdhani)
 
 ### Bluetooth Control Interface
 
-Control via Android application **Serial Bluetooth Terminal** (developed by Kai Morich, available on Google Play Store).
+Control via **Serial Bluetooth Terminal** (Kai Morich, available on Google Play Store).
 
-<img src="Screenshots/BT_control.jpg" alt="Bluetooth Control Interface" width="200">
+<img src="Screenshots/BT_control.jpg" alt="Bluetooth Control Interface" width="250">
 
-**Connection Procedure:**
-1. Power on ESP32 → `ESP32_SMART_HOME` becomes discoverable
-2. Android Settings → Bluetooth → Pair (PIN: 1234)
-3. Open Serial Bluetooth Terminal → Connect to paired device
-4. Send commands: `B3ON` or `B3OFF`
-5. Observe confirmation responses in terminal
-
-**Advantages:** Lower latency (~50 ms) than Wi-Fi, no network infrastructure required, suitable for direct local control.
+No Wi-Fi network infrastructure is required. See [Operational Usage](#operational-usage) for the full connection procedure.
 
 ---
 
@@ -260,7 +244,7 @@ Multi-channel simultaneous control, timer functionality under concurrent sensor 
 
 ### Prerequisites
 
-1. **Hardware Assembly:** Connect components according to pin configuration
+1. **Hardware Assembly:** Connect components according to [Pin Configuration](#pin-configuration)
 2. **Software Requirements:**
    - Arduino IDE 2.x or later
    - ESP32 board support: `https://dl.espressif.com/dl/package_esp32_index.json`
@@ -291,8 +275,7 @@ const char* password = "YOUR_WIFI_PASSWORD";
 
 1. Connect ESP32 via USB cable
 2. Select correct COM port: `Tools → Port → COMX`
-3. Click Upload button (Ctrl+U)
-4. Monitor Serial output at 115200 baud
+3. Click Upload (Ctrl+U) and monitor Serial output at 115200 baud
 
 **Expected Serial Output:**
 ```
@@ -316,15 +299,12 @@ IP address: 192.168.x.x
 **Manual Web Control:**
 1. Connect device to same Wi-Fi network as ESP32
 2. Navigate to IP address shown on LCD: `http://192.168.x.x`
-3. Use individual bulb buttons or master controls
-4. Manual activation overrides sensor state
+3. Use individual bulb buttons or master controls (overrides sensor state)
 
 **Manual Bluetooth Control:**
 1. Pair Android device with `ESP32_SMART_HOME` (PIN: 1234)
-2. Open Serial Bluetooth Terminal application
-3. Connect to paired device
-4. Send commands: `B3ON` or `B3OFF`
-5. Observe confirmation messages
+2. Open Serial Bluetooth Terminal → connect to paired device
+3. Send `B3ON` or `B3OFF` and observe confirmation messages
 
 ### Common Troubleshooting
 
@@ -341,43 +321,30 @@ IP address: 192.168.x.x
 
 ## Results and Discussion
 
-### System Performance Analysis
+### System Performance
 
-The implemented system successfully achieves all primary objectives. Three independent control mechanisms (IR, PIR, Bluetooth, Wi-Fi) operate without interference. The automatic 60-second timeout balances energy efficiency with user convenience.
+All primary objectives were successfully achieved. Three independent control mechanisms (IR, PIR, Bluetooth, Wi-Fi) operate without interference. The automatic 60-second timeout balances energy efficiency with user convenience.
 
 ### Practical Applications
 
-**Residential Use Cases:**
-- **Hallway/Corridor (B1 - IR):** Automatic activation when approaching doorway, hands-free operation
+- **Hallway/Corridor (B1 - IR):** Automatic activation when approaching doorway
 - **Bathroom/Garage (B2 - PIR):** Motion-based lighting with automatic shutoff
-- **Bedroom/Living Room (B3 - Manual):** Full manual control via web/Bluetooth without wall switches
-
-**Advantages Over Commercial Solutions:**
-- Open-source and fully customizable codebase
-- No cloud dependency or subscription fees
-- Multi-protocol flexibility (Wi-Fi, Bluetooth, sensors)
-- Educational value for IoT learning and experimentation
+- **Bedroom/Living Room (B3 - Manual):** Full manual control via web/Bluetooth
 
 ### Design Considerations
 
-**Current Implementation:** Blocking web server (acceptable for single-user scenarios). Global boolean state management provides simple and effective tracking. Security considerations: plaintext Wi-Fi credentials and default Bluetooth PIN suitable for educational/personal use.
+**Current Implementation:** Blocking web server (acceptable for single-user scenarios). Global boolean state management provides simple and effective tracking. Security considerations — plaintext Wi-Fi credentials and default Bluetooth PIN — are suitable for educational/personal use.
+
+**Advantages Over Commercial Solutions:**
+- Open-source, fully customizable, no cloud dependency or subscription fees
+- Multi-protocol flexibility (Wi-Fi, Bluetooth, sensors)
+- High educational value for IoT learning
 
 ---
 
 ## Conclusion
 
-This project demonstrates a functional implementation of an ESP32-based smart lighting system integrating multiple sensor modalities and communication protocols. The modular software architecture, comprehensive component testing methodology, and multi-interface control options provide a robust foundation for residential automation applications.
-
-The system successfully balances autonomous sensor-driven operation with manual control flexibility, achieving energy efficiency objectives while maintaining user convenience. The open-source nature and detailed documentation enable further customization and extension for specific deployment requirements.
-
-
-**Key Contributions:**
-- Practical demonstration of ESP32 IoT capabilities in home automation context
-- Effective integration of heterogeneous sensors and communication protocols
-- Development of responsive web-based control interface without external dependencies
-- Comprehensive modular testing methodology ensuring reliable operation
-
-The project serves dual purpose: practical utility for smart home implementation and educational value for understanding embedded systems, wireless communication, and Internet of Things architecture.
+This project demonstrates a functional ESP32-based smart lighting system that effectively balances autonomous sensor-driven operation with manual control flexibility. The modular software architecture and comprehensive component testing methodology provide a robust foundation for residential automation applications, while the open-source codebase enables further customization for specific deployment requirements.
 
 ---
 
@@ -391,6 +358,5 @@ See [LICENSE](LICENSE) file for complete terms.
 **Project Repository:** https://github.com/Shass27/A_Smart_Bulb_System
 
 **Author:** Shaswath S
-
 
 **Last Updated:** March 2026
