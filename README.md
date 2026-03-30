@@ -321,6 +321,10 @@ IP address: 192.168.x.x
 
 ## Results and Discussion
 
+### Build result
+
+<img src="What_I_Built.HEIC" alt="Build_Result" width="600">
+
 ### System Performance
 
 All primary objectives were successfully achieved. Three independent control mechanisms (IR, PIR, Bluetooth, Wi-Fi) operate without interference. The automatic 60-second timeout balances energy efficiency with user convenience.
