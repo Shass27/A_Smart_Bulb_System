@@ -24,10 +24,6 @@ This project presents the design and implementation of an intelligent lighting c
 
 ## Introduction
 
-### Motivation
-
-Energy efficiency and user convenience in residential lighting systems remain critical challenges in modern smart home applications. Traditional lighting systems require manual intervention and lack adaptive behavior based on occupancy or environmental conditions. This project addresses these limitations by implementing a multi-modal smart lighting system capable of autonomous operation while maintaining manual override capabilities.
-
 ### Objectives
 
 The primary objectives are: (1) Design multi-channel lighting control using ESP32 microcontroller, (2) Integrate heterogeneous sensor inputs for autonomous control, (3) Implement multiple communication protocols (Wi-Fi, Bluetooth Classic), (4) Develop responsive web-based user interface, and (5) Validate functionality through modular component testing.
@@ -105,7 +101,6 @@ ESP32 GPIO Mapping:
 - **Platform:** Arduino IDE 2.x with ESP32 board support
 - **Core Library:** ESP32 Arduino Core v2.x
 - **Language:** C++ (Arduino framework)
-- **Partition Scheme:** Huge APP (3MB No OTA/1MB SPIFFS) - **Required** due to code size
 
 ### Software Dependencies
 
@@ -146,18 +141,14 @@ void loop() {
 }
 ```
 
-**Execution Frequency:** ~10-50 ms cycle time depending on active operations.
-
 ### Sensor Handling
 
 **IR Proximity Detection (Bulb B1):**
 - Active-LOW detection when object within 2-3 cm
-- Response time: <100 ms
 - Activates B1, records timestamp
 - 60-second automatic timeout after last detection
 
 **PIR Motion Detection (Bulb B2):**
-- Active-HIGH detection up to 7 meters, 120° cone
 - Warm-up period: 30 seconds after power-on
 - Activates B2, records timestamp
 - Timer resets on continued motion detection
@@ -169,14 +160,12 @@ void loop() {
 - Device name: `ESP32_SMART_HOME`
 - Pairing PIN: `1234` (default)
 - Commands: `B3ON` / `B3OFF` (newline-terminated, case-sensitive)
-- Latency: ~50 ms
 - Advantage: No network infrastructure required
 
 **Wi-Fi Web Server:**
 - HTTP server on port 80
 - Connects to configured Wi-Fi network
 - Serves responsive HTML/CSS control interface
-- Latency: ~120-180 ms per request
 
 **HTTP Endpoints:**
 
@@ -208,7 +197,7 @@ Line 2: ON  OFF ON
 
 The system serves a responsive HTML5 interface with embedded CSS. The GUI provides individual bulb control and master ON/OFF switches.
 
-<img src="Screenshots/GUI.jpg" alt="Web GUI Control Interface" width="600">
+<img src="Screenshots/GUI.jpg" alt="Web GUI Control Interface" width="300">
 
 **Features:**
 - Real-time color-coded status indicators
@@ -224,7 +213,7 @@ The system serves a responsive HTML5 interface with embedded CSS. The GUI provid
 
 Control via Android application **Serial Bluetooth Terminal** (developed by Kai Morich, available on Google Play Store).
 
-<img src="Screenshots/BT_control.jpg" alt="Bluetooth Control Interface" width="600">
+<img src="Screenshots/BT_control.jpg" alt="Bluetooth Control Interface" width="200">
 
 **Connection Procedure:**
 1. Power on ESP32 → `ESP32_SMART_HOME` becomes discoverable
@@ -264,17 +253,6 @@ Bluetooth pairing and bidirectional echo test, Wi-Fi connection establishment, H
 
 **Stage 4 - Integration Testing:**
 Multi-channel simultaneous control, timer functionality under concurrent sensor activation, LCD refresh rate optimization.
-
-### Performance Metrics
-
-All component tests completed successfully with following measured parameters:
-
-- **IR Sensor Response Time:** 87 ms average (Serial timestamp method)
-- **PIR False Positive Rate:** <2% after warm-up period
-- **Wi-Fi Connection Time:** 3-5 seconds (network dependent)
-- **Bluetooth Pairing Reliability:** 100% success across 20 trials
-- **Web Server Response Time:** 120-180 ms per HTTP transaction
-- **Timer Accuracy:** ±50 ms over 60-second period (0.08% error)
 
 ---
 
@@ -365,7 +343,7 @@ IP address: 192.168.x.x
 
 ### System Performance Analysis
 
-The implemented system successfully achieves all primary objectives. Three independent control mechanisms (IR, PIR, Bluetooth, Wi-Fi) operate without interference. Real-time response latencies: sensor activation <150 ms, web control 180 ms, Bluetooth 50 ms. The automatic 60-second timeout balances energy efficiency with user convenience.
+The implemented system successfully achieves all primary objectives. Three independent control mechanisms (IR, PIR, Bluetooth, Wi-Fi) operate without interference. The automatic 60-second timeout balances energy efficiency with user convenience.
 
 ### Practical Applications
 
@@ -384,24 +362,6 @@ The implemented system successfully achieves all primary objectives. Three indep
 
 **Current Implementation:** Blocking web server (acceptable for single-user scenarios). Global boolean state management provides simple and effective tracking. Security considerations: plaintext Wi-Fi credentials and default Bluetooth PIN suitable for educational/personal use.
 
-**Production Recommendations:** ESPAsyncWebServer for non-blocking HTTP, WiFiManager for captive portal configuration, HTTPS encryption, certificate validation, stronger authentication (WPA2-Enterprise), state machine pattern for complex logic.
-
-### Future Enhancement Opportunities
-
-**Short-Term Improvements:**
-- MQTT integration for Home Assistant/OpenHAB compatibility
-- EEPROM/NVS storage for user-configurable timeout durations
-- Ambient light sensor for automatic brightness adjustment
-- Over-the-air (OTA) firmware update capability
-
-**Long-Term Extensions:**
-- Voice control integration (Amazon Alexa, Google Assistant)
-- Native mobile applications (iOS/Android)
-- Machine learning-based usage pattern prediction
-- ESP-NOW mesh networking for multi-room systems
-- Scheduling and timer functionality
-- Power consumption monitoring via current sensors
-
 ---
 
 ## Conclusion
@@ -409,6 +369,7 @@ The implemented system successfully achieves all primary objectives. Three indep
 This project demonstrates a functional implementation of an ESP32-based smart lighting system integrating multiple sensor modalities and communication protocols. The modular software architecture, comprehensive component testing methodology, and multi-interface control options provide a robust foundation for residential automation applications.
 
 The system successfully balances autonomous sensor-driven operation with manual control flexibility, achieving energy efficiency objectives while maintaining user convenience. The open-source nature and detailed documentation enable further customization and extension for specific deployment requirements.
+
 
 **Key Contributions:**
 - Practical demonstration of ESP32 IoT capabilities in home automation context
@@ -423,15 +384,6 @@ The project serves dual purpose: practical utility for smart home implementation
 ## License
 
 This project is licensed under the **MIT License**.
-
-Copyright (c) 2026 Shaswath S
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
 See [LICENSE](LICENSE) file for complete terms.
 
 ---
@@ -439,5 +391,6 @@ See [LICENSE](LICENSE) file for complete terms.
 **Project Repository:** https://github.com/Shass27/A_Smart_Bulb_System
 
 **Author:** Shaswath S
-**Version:** 1.0
+
+
 **Last Updated:** March 2026
